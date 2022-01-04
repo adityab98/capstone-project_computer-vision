@@ -7,7 +7,7 @@ cclassifier = 'lbpcascade_frontalface.xml'
 subjects = ["", "Amber Heard", "Bill Gates", "Jason Momoa", "Paul Rudd", 
         "Scarlett Johansson"]
 face_recognizer = cv2.face.LBPHFaceRecognizer_create()
-img_len = 700
+img_len = 500
 img_width = 400
 
 def detect_face(img):
@@ -73,8 +73,18 @@ def predict(test_img):
         draw_text(image2,"No face detected",6,25)
         return image2
 
+def video_cap():
+    face_recognizer.read('eigen.cv2')
+    video_cap = cv2.VideoCapture(0)
+    while True:
+        captured_image = video_cap.read()[1]
+        cv2.imshow('Video', predict(captured_image))
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+
 # Helper fn to predict all images in test dir
 def predict_all():
+    face_recognizer.read('eigen.cv2')
     testsubs = os.listdir("test-data")
     for imagename in testsubs:
         imagepath = "test-data/" + imagename
@@ -95,24 +105,8 @@ def prepare_data():
     face_recognizer.write('eigen.cv2')
     print("Face recognizer written to disk")
 
-def video_cap():
-    video_cap = cv2.VideoCapture(0)
-    while True:
-        captured_image = video_cap.read()[1]
-        captured_image = cv2.resize(captured_image, (img_width, img_len))
-        faces, rects = detect_face(captured_image)
-        if faces is not None:
-            for i in range(len(faces)):
-                draw_rectangle(captured_image, rects[i])
-        else:
-            draw_text(captured_image,"No face detected",6,25)
-        cv2.imshow('Video', captured_image)
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
-
 def main():
     #prepare_data()
-    #face_recognizer.read('eigen.cv2')
     #predict_all()
     video_cap()
 

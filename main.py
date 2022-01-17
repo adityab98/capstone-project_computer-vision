@@ -1,6 +1,7 @@
 from cv2 import cv2
 import os
 import numpy as np
+from fer import FER
 
 ocvfiles = 'opencv-files'
 cclassifier = 'lbpcascade_frontalface.xml'
@@ -61,10 +62,15 @@ def predict(test_img):
     img = test_img.copy()
     image2 = cv2.resize(img, (img_width, img_len))
     faces, rects = detect_face(image2)
-    if faces is not None:
+    emotion_detector = FER(mtcnn=True)
+    if faces is not None and rects is not None:
         for i in range(len(faces)):
             label, confidence = face_recognizer.predict(cv2.resize(faces[i],
                 (100, 200)))
+            (x, y, w, h) = rects[i]
+            captured_emotions = emotion_detector.detect_emotions(image2[y:y+h,
+                x:x+w])
+            print(captured_emotions)
             label_text = subjects[label] + "(" + str(confidence) + "%)"
             draw_rectangle(image2, rects[i])
             draw_text(image2, label_text, rects[i][0], rects[i][1]-5)
@@ -107,8 +113,8 @@ def prepare_data():
 
 def main():
     #prepare_data()
-    #predict_all()
-    video_cap()
+    predict_all()
+    #video_cap()
 
 if __name__ == "__main__":
     main()

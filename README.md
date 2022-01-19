@@ -15,3 +15,4 @@ in Arch repositories. Don't know yet the commands to make it work on other OSes.
   thing with conflicting image sizes.
 - Add emotion recognition (DONE)
     - Top detected emotion next to detected face's name (DONE)
+- Optimize tensorflow. Maybe make emotion recognition run every 5 seconds?

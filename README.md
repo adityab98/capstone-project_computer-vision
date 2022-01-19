@@ -14,4 +14,4 @@ in Arch repositories. Don't know yet the commands to make it work on other OSes.
 - Fix image sizes. It's all way too wonky. Or figure out a way to do the whole
   thing with conflicting image sizes.
 - Add emotion recognition (DONE)
-    - Top 2 detected emotions next to detected face's name
+    - Top detected emotion next to detected face's name (DONE)

@@ -4,10 +4,20 @@ import numpy as np
 from cv2 import cv2
 from fer import FER
 
+# tensorflow config
+#Assume that the number of cores per socket in the machine is denoted as NUM_PARALLEL_EXEC_UNITS
+#  when NUM_PARALLEL_EXEC_UNITS=0 the system chooses appropriate settings 
+#import tensorflow as tf
+#config = tf.compat.v1.ConfigProto(intra_op_parallelism_threads=0, 
+#                        inter_op_parallelism_threads=0, 
+#                        allow_soft_placement=True,
+#                        device_count = {'CPU': 0})
+#session = tf.compat.v1.Session(config=config)
 
 # Global variables
 ocv_files = 'opencv-files'
-cascade_classifier = 'lbpcascade_frontalface.xml'
+#cascade_classifier = 'lbpcascade_frontalface.xml'
+cascade_classifier = 'haarcascade_frontalface_alt.xml'
 subjects = ["", "Amber Heard", "Bill Gates", "Jason Momoa", "Paul Rudd", 
         "Scarlett Johansson"]
 img_len = 500
@@ -17,7 +27,8 @@ img_width = 400
 face_cascade = cv2.CascadeClassifier(os.path.join(ocv_files,
     cascade_classifier))
 face_recognizer = cv2.face.LBPHFaceRecognizer_create()
-emotion_detector = FER(mtcnn = True)
+#emotion_detector = FER(mtcnn = True)
+emotion_detector = FER()
 
 # Helper fn to draw rectangles on images
 def draw_rectangle(img, rect):

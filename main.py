@@ -3,9 +3,16 @@ import os
 import numpy as np
 from cv2 import cv2
 from fer import FER
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.mime.base import MIMEBase
+from email.mime.image import MIMEImage
+from email import encoders
 
 # tensorflow config
-#Assume that the number of cores per socket in the machine is denoted as NUM_PARALLEL_EXEC_UNITS
+#Assume that the number of cores per socket in the machine is denoted as
+#NUM_PARALLEL_EXEC_UNITS
 #  when NUM_PARALLEL_EXEC_UNITS=0 the system chooses appropriate settings 
 #import tensorflow as tf
 #config = tf.compat.v1.ConfigProto(intra_op_parallelism_threads=0, 
@@ -15,8 +22,9 @@ from fer import FER
 #session = tf.compat.v1.Session(config=config)
 
 # Global variables
+sender_address = 'adityabhargav9876@gmail.com'
+physical_address = 'XXX YYY ZZZ, India'
 ocv_files = 'opencv-files'
-#cascade_classifier = 'lbpcascade_frontalface.xml'
 cascade_classifier = 'haarcascade_frontalface_alt.xml'
 subjects = ["", "Amber Heard", "Bill Gates", "Jason Momoa", "Paul Rudd", 
         "Scarlett Johansson"]
@@ -27,8 +35,30 @@ img_width = 400
 face_cascade = cv2.CascadeClassifier(os.path.join(ocv_files,
     cascade_classifier))
 face_recognizer = cv2.face.LBPHFaceRecognizer_create()
-#emotion_detector = FER(mtcnn = True)
 emotion_detector = FER()
+
+def notify_authorities(image, sender_pass):
+    receiver_address = 'adityabhargav9876@gmail.com'
+    message = MIMEMultipart()
+    message['From'] = sender_address
+    message['To'] = receiver_address
+    message['Subject'] = 'EMERGENCY'
+    content = 'Possible violent event at ' + physical_address 
+    content = content + ". Possible attacker shown in image"
+    message.attach(MIMEText(content, 'plain'))
+    cv2.imwrite('WARNING.jpg', image)
+    attach_file_name = 'WARNING.jpg'
+    with open(attach_file_name, 'rb') as f:
+        img_data = f.read()
+    img = MIMEImage(img_data, name=attach_file_name)
+    message.attach(img)
+    session = smtplib.SMTP('smtp.gmail.com', 587)
+    session.starttls()
+    session.login(sender_address, sender_pass)
+    text = message.as_string()
+    session.sendmail(sender_address, receiver_address, text)
+    session.quit()
+    print("Notified authorities")
 
 # Helper fn to draw rectangles on images
 def draw_rectangle(img, rect):
@@ -38,7 +68,8 @@ def draw_rectangle(img, rect):
 # Helper fn to draw text on images
 def draw_text(img, text, x, y, emotion):
     cv2.putText(img, text, (x, y), cv2.FONT_HERSHEY_PLAIN, 1.0, (0, 255, 0), 2)
-    cv2.putText(img, emotion, (x, y+15), cv2.FONT_HERSHEY_PLAIN, 1.0, (0, 255, 0), 2)
+    cv2.putText(img, emotion, (x, y+15), cv2.FONT_HERSHEY_PLAIN, 1.0, (0, 255,
+        0), 2)
 
 # Detects all faces in an image
 def detect_face(img):
@@ -75,7 +106,8 @@ def predict(test_img):
                     max_emotion = 'Emotion: ' + max_emotion
             label_text = subjects[label] + "(" + str(round(confidence)) + "%)"
             draw_rectangle(image2, rects[i])
-            draw_text(image2, label_text, rects[i][0], rects[i][1]-5, max_emotion)
+            draw_text(image2, label_text, rects[i][0], rects[i][1]-5,
+                    max_emotion)
         return image2
     else:
         draw_text(image2,"No face detected",6,25, "")

@@ -1,8 +1,9 @@
 # Capstone Project
 
-How to make keras and tensorflow work on AMD GPU:
-python-keras python-tensorflow tensorflow tensorflow-opt python-tensorflow-opt
-in Arch repositories. Don't know yet the commands to make it work on other OSes.
+To get tensorflow, keras, and thus fer to work on a non-Nvidia machine, you need
+to install python-keras python-tensorflow tensorflow tensorflow-opt
+python-tensorflow-opt from the Arch Linux package repositories. I don't know how
+to do the same for any other OS.
 
 Provide your Gmail password as an argument to main.py
 

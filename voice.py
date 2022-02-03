@@ -9,11 +9,23 @@ from sklearn.neural_network import MLPClassifier # multi-layer perceptron model
 class Voice_Recognizer:
 
     def __init__(self, training_data):
-        self.int2emotion = {"01": "neutral", "02": "calm", "03": "happy", "04":
-                "sad", "05": "angry", "06": "fearful", "07": "disgust", "08":
-                "surprised"}
-        self.available_emotions = {"angry", "sad", "fearful", "disgust",
-                "surprise"}
+        self.int2emotion = {
+                "01": "neutral", 
+                "02": "calm", 
+                "03": "happy", 
+                "04": "sad", 
+                "05": "angry", 
+                "06": "fearful", 
+                "07": "disgust", 
+                "08": "surprised"
+        }
+        self.available_emotions = {
+                "angry", 
+                "sad", 
+                "fearful", 
+                "disgust",
+                "surprise"
+        }
         self.training_data = training_data
         if (os.path.exists("mlp_classifier.model")):
             print("Voice_Recognizer: Pre-trained model found...")

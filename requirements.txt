@@ -2,3 +2,9 @@ opencv-python
 numpy
 opencv-contrib-python
 fer
+soundfile
+librosa
+glob
+os
+pickle
+sklearn

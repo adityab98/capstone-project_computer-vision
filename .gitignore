@@ -1,2 +1,5 @@
 *.cv2
 WARNING.jpg
+__pycache__*
+*.model
+data_files*

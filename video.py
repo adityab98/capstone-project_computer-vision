@@ -16,6 +16,12 @@ class Image_Helper:
         cv2.putText(img, text, (x, y), cv2.FONT_HERSHEY_PLAIN, 1.0, (0, 255, 0),
                 2)
 
+    @staticmethod
+    def video_cap():
+        video_cap = cv2.VideoCapture(0)
+        captured_image = video_cap.read()[1]
+        return captured_image
+
 class Face_Recognizers:
 
     def __init__(self, cascade_classifier, img_len, img_width, subjects, training_data, test_data):
@@ -100,25 +106,20 @@ class Face_Recognizers:
         img = test_img.copy()
         img = cv2.resize(img, (self.img_width, self.img_len))
         faces, rects = self.detect_face(img)
+        predictions = []
         if faces is not None and rects is not None:
             for i in range(len(faces)):
                 face = cv2.resize(faces[i], (100, 200))
                 label, confidence = self.face_recognizer.predict(face)
                 confidence = round(confidence)
                 emotion = self.emo_recognizer.predict(img, rects[i])
-                label_text = self.subjects[label] + "(" + str(confidence) + "%)"
-                Image_Helper.draw_rectangle(img, rects[i])
-                Image_Helper.draw_text(img, label_text, rects[i][0],
-                        rects[i][1]-5)
-                Image_Helper.draw_text(img, emotion, rects[i][0],
-                        rects[i][1]+10)
-            return img
+                if (confidence < 50):
+                    predictions.append(("Unknown", confidence, emotion))
+                else:
+                    predictions.append((label, confidence, emotion))
+            return predictions
         else:
-            Image_Helper.draw_text(img,"No face detected",6,25)
-            return img
-
-    def video_cap(self):
-        self.face_recognizer.read('')
+            return predictions
 
 class Emotion_Recognizer:
 

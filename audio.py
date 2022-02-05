@@ -21,13 +21,6 @@ class Voice_Recognizer:
                 "07": "disgust", 
                 "08": "surprised"
         }
-        self.available_emotions = {
-                "angry", 
-                "sad", 
-                "fearful", 
-                "disgust",
-                "surprise"
-        }
         self.training_data = training_data
         if (os.path.exists("mlp_classifier.model")):
             print("Voice_Recognizer: Pre-trained model found...")
@@ -76,8 +69,6 @@ class Voice_Recognizer:
             "*.wav")):
             basename = os.path.basename(file)
             emotion = self.int2emotion[basename.split("-")[2]]
-            if emotion not in self.available_emotions:
-                continue
             features = self.extract_feature(file, mfcc = True, chroma = True,
                     mel = True)
             X.append(features)

@@ -1,9 +1,9 @@
 #!/bin/python
 
 import sys
-from face import *
+from video import *
 from notifier import *
-from voice import *
+from audio import *
 
 def main(password):
     sender_address = 'adityabhargav9876@gmail.com'

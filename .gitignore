@@ -3,3 +3,4 @@ WARNING.jpg
 __pycache__*
 *.model
 data_files*
+live_recording.wav

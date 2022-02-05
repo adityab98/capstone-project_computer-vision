@@ -5,6 +5,8 @@ import glob
 import os
 import pickle
 from sklearn.neural_network import MLPClassifier # multi-layer perceptron model
+import sounddevice as sd
+from scipy.io.wavfile import write
 
 class Voice_Recognizer:
 
@@ -104,3 +106,15 @@ class Voice_Recognizer:
         features = self.extract_feature(audio_src_file, mfcc = True, chroma =
                 True, mel = True)
         return self.model.predict(np.array([features]))[0]
+
+class Recorder:
+
+    def __init__(self):
+        self.freq = 48000
+        self.duration = 10
+
+    def record(self):
+        recording = sd.rec(int(self.duration * self.freq), 
+                samplerate = self.freq, channels = 2)
+        sd.wait()
+        write("live_recording.wav", self.freq, recording)

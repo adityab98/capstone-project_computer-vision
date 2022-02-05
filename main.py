@@ -14,13 +14,16 @@ def main(password):
             "Scarlett Johansson"]
     img_len = 500
     img_width = 400
+    """
     face_rec = Face_Recognizers(os.path.join(ocv_files, cascade_classifier),
             img_len, img_width, subjects, os.path.join("data_files",
                 "face_training"), os.path.join("data_files", "face_test"))
     notifier = Notifier(sender_address, physical_address, sender_address,
             password)
     voice_rec = Voice_Recognizer(os.path.join("data_files", "voice_training"))
-    print(voice_rec.predict("data_files/voice_training/Actor_07/03-01-06-01-01-01-07.wav"))
+    """
+    recorder = Recorder()
+    recorder.record()
     return 0
 
 if __name__ == "__main__":

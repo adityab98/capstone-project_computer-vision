@@ -4,3 +4,4 @@ __pycache__*
 *.model
 data_files*
 live_recording.wav
+demo*

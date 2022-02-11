@@ -26,7 +26,6 @@ def main():
             password)
     recorder = Recorder()
     voice_rec = Voice_Recognizer(os.path.join("data_files", "voice_training"))
-    return 0
 
 if __name__ == "__main__":
     main()

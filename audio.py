@@ -102,10 +102,11 @@ class Recorder:
 
     def __init__(self):
         self.freq = 48000
-        self.duration = 10
 
-    def record(self):
-        recording = sd.rec(int(self.duration * self.freq), 
+    def record(self, duration = 10):
+        print("recording...")
+        recording = sd.rec(int(duration * self.freq), 
                 samplerate = self.freq, channels = 1)
         sd.wait()
+        print("writing recording to disk...")
         write("live_recording.wav", self.freq, recording)

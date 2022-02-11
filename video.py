@@ -119,9 +119,15 @@ class Face_Recognizers:
                     predictions.append(("Unknown", confidence, emotion))
                 else:
                     predictions.append((label, confidence, emotion))
-            return predictions
+                label_text = self.subjects[label] + "(" + str(confidence) + "%)"
+                Image_Helper.draw_rectangle(img, rects[i])
+                Image_Helper.draw_text(img, label_text, rects[i][0],
+                        rects[i][1]-5)
+                Image_Helper.draw_text(img, emotion, rects[i][0],
+                        rects[i][1]+10)
+            return img
         else:
-            Image_Helper.draw_text(img,"No face detected",6,25)
+            Image_Helper.draw_text(img, "No face detected", 6, 25)
             return img
 
     def video_cap(self):
@@ -132,7 +138,6 @@ class Face_Recognizers:
                 self.img_len)))
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
-            return predictions
 
 class Emotion_Recognizer:
 

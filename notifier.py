@@ -13,6 +13,9 @@ class Notifier:
         self.password = password
 
     def notify(self, image):
+        if (self.password is None):
+            print("Invalid password. Aborting...")
+            return
         message = MIMEMultipart()
         message['From'] = self.sender_address
         message['To'] = self.receiver_address

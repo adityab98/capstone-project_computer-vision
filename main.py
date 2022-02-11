@@ -1,6 +1,7 @@
 #!/bin/python
 
 import sys
+import os
 from video import *
 from notifier import *
 from audio import *
@@ -26,6 +27,11 @@ def main():
             password)
     recorder = Recorder()
     voice_rec = Voice_Recognizer(os.path.join("data_files", "voice_training"))
+    files = os.listdir("demo")
+    for file in files:
+        print(file, end = ' ')
+        print(voice_rec.predict(os.path.join("demo", file)))
+    return 0
 
 if __name__ == "__main__":
     main()

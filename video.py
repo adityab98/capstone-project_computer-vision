@@ -24,7 +24,8 @@ class Image_Helper:
 
 class Face_Recognizers:
 
-    def __init__(self, cascade_classifier, img_len, img_width, subjects, training_data, test_data):
+    def __init__(self, cascade_classifier, img_len, img_width, subjects,
+            training_data, test_data):
         self.cascade_classifier = cascade_classifier
         self.face_cascade = cv2.CascadeClassifier(self.cascade_classifier)
         self.face_recognizer = cv2.face.LBPHFaceRecognizer_create()
@@ -38,7 +39,8 @@ class Face_Recognizers:
             print("Face_Recognizer: Pre-trained model found...")
             self.face_recognizer.read('face_recognizer.cv2')
         else:
-            print("Face_Recognizer: No pre-trained model found. Training model...")
+            print("""Face_Recognizer: No pre-trained model found. Training
+                    model...""")
             self.train()
     
     def predict_all(self):
@@ -119,6 +121,17 @@ class Face_Recognizers:
                     predictions.append((label, confidence, emotion))
             return predictions
         else:
+            Image_Helper.draw_text(img,"No face detected",6,25)
+            return img
+
+    def video_cap(self):
+        video_capture = cv2.VideoCapture(0)
+        while True:
+            rect, frames = video_capture.read()
+            cv2.imshow("Live", cv2.resize(self.predict(frames), (self.img_width,
+                self.img_len)))
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
             return predictions
 
 class Emotion_Recognizer:

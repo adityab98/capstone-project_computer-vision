@@ -1,5 +1,4 @@
-#!/bin/python
-
+#!/usr/bin/env python3
 import sys
 import os
 from video import *
@@ -25,13 +24,17 @@ def main():
                 "face_training"), os.path.join("data_files", "face_test"))
     notifier = Notifier(sender_address, physical_address, sender_address,
             password)
-    recorder = Recorder()
     voice_rec = Voice_Recognizer(os.path.join("data_files", "voice_training"))
+    recorder = Recorder()
+    #face_rec.predict_all()
+    #face_rec.video_cap()
     files = os.listdir("demo")
     for file in files:
         print(file, end = ' ')
         print(voice_rec.predict(os.path.join("demo", file)))
-    return 0
+    #recorder.record()
+    #voice_rec.predict("live_recording.wav")
+    #notifier.notify(cv2.imread("data_files/face_test/test10.jpg"))
 
 if __name__ == "__main__":
     main()

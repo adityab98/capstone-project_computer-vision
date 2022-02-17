@@ -30,16 +30,29 @@ class Voice_Recognizer:
             self.model = self.train()
             
     def extract_feature(self, file_name, **kwargs):
+        # Mel Frequency Cepstral Coefficient, represents the short-term power
+        # spectrum of a sound
         mfcc = kwargs.get("mfcc")
+        # the 12 different pitch classes
         chroma = kwargs.get("chroma")
+        # Mel Spectrogram Frequency
         mel = kwargs.get("mel")
+        # Each frame of a spectogram is divided into bands. for each band,
+        # compute the contrast by comparing mean energy in top quartile to that
+        # of the bottom quartile. high contrast = clear signals. 
+        # low contrast = noise
         contrast = kwargs.get("contrast")
+        # project chroma feature onto 6-dimensional basis
         tonnetz = kwargs.get("tonnetz")
         with soundfile.SoundFile(file_name) as sound_file:
             X = sound_file.read(dtype = "float32")
             sample_rate = sound_file.samplerate
             if chroma or contrast:
+                # short-time fourier transform
+                # represents a signal in time-frequency domain by computing
+                # discrete fourier transforms over short overlapping windows
                 stft = np.abs(librosa.stft(X))
+            # contains all the features stacked horizontally
             result = np.array([])
             if mfcc:
                 mfccs = np.mean(librosa.feature.mfcc(y = X, sr = sample_rate,
@@ -70,7 +83,7 @@ class Voice_Recognizer:
             basename = os.path.basename(file)
             emotion = self.int2emotion[basename.split("-")[2]]
             features = self.extract_feature(file, mfcc = True, chroma = True,
-                    mel = True)
+                    mel = True, contrast = True, tonnetz = True)
             X.append(features)
             y.append(emotion)
         return np.array(X), y
@@ -95,7 +108,7 @@ class Voice_Recognizer:
 
     def predict(self, audio_src_file):
         features = self.extract_feature(audio_src_file, mfcc = True, chroma =
-                True, mel = True)
+                True, mel = True, contrast = True, tonnetz = True)
         return self.model.predict(np.array([features]))[0]
 
 class Recorder:

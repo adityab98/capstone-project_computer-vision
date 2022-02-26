@@ -5,3 +5,4 @@ __pycache__*
 data_files*
 live_recording.wav
 demo*
+*.list

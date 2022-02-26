@@ -47,6 +47,7 @@ class Face_Recognizers:
         test_subjects = os.listdir(self.test_data)
         for image_name in test_subjects:
             image_path = os.path.join(self.test_data, image_name)
+            print("predicting..." + image_path)
             test_img = cv2.imread(image_path)
             predicted_img = self.predict(test_img)
             cv2.imshow(image_name, cv2.resize(predicted_img, (self.img_width,

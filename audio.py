@@ -174,16 +174,20 @@ class Voice_Recognizer:
         print("[+] Number of features:", X_train.shape[1])
         model_params = {
             'alpha': 0.01,
-            'batch_size': 256,
-            'epsilon': 1e-08, 
-            'hidden_layer_sizes': (300,), 
+            'batch_size': 300,
+            'epsilon': 0.01,
+            'hidden_layer_sizes': (1000,), 
             'learning_rate': 'adaptive', 
-            'max_iter': 500, 
+            'max_iter': 5000,
+            'solver': 'adam',
+            'activation': 'tanh',
+            'shuffle': True
         }
         model = MLPClassifier(**model_params)
         print("[*] Training the model...")
         model.fit(X_train, y_train)
         pickle.dump(model, open("mlp_classifier.model", "wb"))
+        print("[*] Testing the model...")
         y_pred = model.predict(X_test)
         accuracy = accuracy_score(y_true = y_test, y_pred = y_pred)
         print("Accuracy: {:.2f}%".format(accuracy*100))

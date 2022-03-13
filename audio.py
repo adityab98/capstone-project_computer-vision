@@ -25,12 +25,12 @@ class Voice_Recognizer:
                 "08": "surprised"
         }
         self.training_data = training_data
-        if (os.path.exists("mlp_classifier.model")):
-            print("Voice_Recognizer: Pre-trained model found...")
-            self.model = pickle.load(open("mlp_classifier.model", 'rb'))
-        else:
-            print("Voice_Recognizer: No pre-trained model found...")
-            self.model = self.train()
+        # if (os.path.exists("mlp_classifier.model")):
+            # print("Voice_Recognizer: Pre-trained model found...")
+            # self.model = pickle.load(open("mlp_classifier.model", 'rb'))
+        # else:
+            # print("Voice_Recognizer: No pre-trained model found...")
+            # self.model = self.train()
             
     def extract_feature(self, file_name, **kwargs):
         # Mel Frequency Cepstral Coefficient, represents the short-term power
@@ -66,7 +66,7 @@ class Voice_Recognizer:
                     sample_rate).T, axis = 0)
                 result = np.hstack((result, chroma))
             if mel:
-                mel = np.mean(librosa.feature.melspectrogram(X, sr =
+                mel = np.mean(librosa.feature.melspectrogram(y = X, sr =
                     sample_rate).T, axis = 0)
                 result = np.hstack((result, mel))
             if contrast:
@@ -168,20 +168,23 @@ class Voice_Recognizer:
             tmp = np.hstack((tmp, tonnetzs_arr[i]))
             X.append(tmp)
             del tmp
-        X_train, X_test, y_train, y_test = train_test_split(np.array(X), y, test_size = 0.2, random_state = 7)
+        X_train, X_test, y_train, y_test = train_test_split(np.array(X), y, test_size = 0.2)
         print("[+] Number of training samples:", X_train.shape[0])
         print("[+] Number of testing samples:", X_test.shape[0])
         print("[+] Number of features:", X_train.shape[1])
+        from sklearn.preprocessing import StandardScaler
+        scaler = StandardScaler()
+        scaler.fit(X_train)
+        X_train = scaler.transform(X_train)
+        X_test = scaler.transform(X_test)
         model_params = {
-            'alpha': 0.1,
+            'alpha': 0.001,
             'batch_size': 300,
-            'epsilon': 0.01,
             'hidden_layer_sizes': (1000,), 
-            'learning_rate': 'adaptive', 
-            'max_iter': 5000,
-            'solver': 'adam',
-            'activation': 'tanh',
-            'shuffle': False
+            'max_iter': 20000,
+            'solver': 'lbfgs',
+            'activation': 'logistic',
+            'verbose': True
         }
         model = MLPClassifier(**model_params)
         print("[*] Training the model...")

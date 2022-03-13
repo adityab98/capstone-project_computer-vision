@@ -6,3 +6,4 @@ data_files*
 live_recording.wav
 demo*
 *.list
+.ipynb_checkpoints

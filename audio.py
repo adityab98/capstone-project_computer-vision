@@ -173,7 +173,7 @@ class Voice_Recognizer:
         print("[+] Number of testing samples:", X_test.shape[0])
         print("[+] Number of features:", X_train.shape[1])
         model_params = {
-            'alpha': 0.01,
+            'alpha': 0.1,
             'batch_size': 300,
             'epsilon': 0.01,
             'hidden_layer_sizes': (1000,), 
@@ -181,7 +181,7 @@ class Voice_Recognizer:
             'max_iter': 5000,
             'solver': 'adam',
             'activation': 'tanh',
-            'shuffle': True
+            'shuffle': False
         }
         model = MLPClassifier(**model_params)
         print("[*] Training the model...")

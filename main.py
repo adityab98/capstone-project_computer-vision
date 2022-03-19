@@ -1,8 +1,6 @@
-import sys
 import os
-# from video import *
 from audio import *
-import numpy as np
+# from video import *
 
 def main():
     """ocv_files = 'opencv_files'
@@ -18,18 +16,6 @@ def main():
     face_rec.video_cap()"""
     voice_rec = Voice_Recognizer(os.path.join("data_files", "voice_training"))
     voice_rec.full_research()
-    # voice_rec.train_adam()
-    # voice_rec.train_lbgfs()
-    # voice_rec.train_ensemble()
-    # files = os.listdir("demo")
-    # arr = []
-    # for file in files:
-        # femo = file.split("_")[2].split(".")[0]
-        # if (femo == 'ps'):
-            # continue
-        # if (femo == 'fear'):
-            # femo = 'fearful'
-        # arr.append([femo, voice_rec.predict_ensemble(os.path.join("demo", file))])
     
 if __name__ == "__main__":
     main()

@@ -1,6 +1,8 @@
 import os
 from audio import *
 # from video import *
+import warnings
+warnings.filterwarnings("ignore")
 
 def main():
     """ocv_files = 'opencv_files'
@@ -16,6 +18,7 @@ def main():
     face_rec.video_cap()"""
     voice_rec = Voice_Recognizer(os.path.join("data_files", "voice_training"))
     voice_rec.full_research()
+    # voice_rec.finalize_models()
     
 if __name__ == "__main__":
-    main()
+    main()  

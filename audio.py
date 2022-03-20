@@ -4,12 +4,15 @@ import librosa
 import glob
 import os
 import pickle
+import warnings
 from sklearn.neural_network import MLPClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
+
+warnings.filterwarnings("ignore")
 
 class Voice_Recognizer:
     def __init__(self, training_data):
@@ -262,3 +265,13 @@ class Voice_Recognizer:
         ensemble_model = pickle.load(open("ensemble.model", "rb"))
         stackX = self.get_stacked(X, [adam_model, lbgfs_model])
         return ensemble_model.predict(stackX)[0]
+
+def main():
+    voice_rec = Voice_Recognizer(os.path.join("data_files", "voice_training"))
+    voice_rec.full_research()
+    # voice_rec.finalize_models()
+    for file in glob.glob(os.path.join("demo", "*.wav")):
+        print(os.path.basename(file) + " " + voice_rec.predict(file))
+    
+if __name__ == "__main__":
+    main()  

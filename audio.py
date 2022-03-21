@@ -142,38 +142,23 @@ class Voice_Recognizer:
             del tmp
         print("[*]L0 Preprocessing data...")
         X = self.normalize(X)
-        X_train_l0, X_test_l0, y_train_l0, y_test_l0 = train_test_split(X, y, test_size = 0.4)
-        print("[*]L0 Training MLPClassifier NN with adam solver...")
-        adam_model_params = {
-            'alpha': 0.0001,
-            'batch_size': 300,
-            'epsilon': 0.01,
-            'hidden_layer_sizes': (1000,),
-            'max_iter': 5000,
-            'solver': 'adam',
-            'activation': 'tanh',
-            'shuffle': True,
-            'n_iter_no_change': 50,
-        }
-        adam_model = MLPClassifier(**adam_model_params)
-        adam_model.fit(X_train_l0, y_train_l0)
-        print("[*]L0 Testing MLPClassifier NN with adam solver...")
-        accuracy = accuracy_score(y_true = y_test_l0, y_pred = adam_model.predict(X_test_l0))
-        print("\tAccuracy: {:.2f}%".format(accuracy*100))
-        print("[*]L0 Training MLPClassifier NN with lbfgs solver...")
-        lbgfs_model_params = {
-            'alpha': 0.0001,
-            'batch_size': 300,
-            'hidden_layer_sizes': (1000,), 
-            'max_iter': 5000,
-            'solver': 'lbfgs',
-            'activation': 'tanh',
-        }
-        lbgfs_model = MLPClassifier(**lbgfs_model_params)
-        lbgfs_model.fit(X_train_l0, y_train_l0)
-        print("[*]L0 Testing MLPClassifier NN with lbfgs solver...")
-        accuracy = accuracy_score(y_true = y_test_l0, y_pred = lbgfs_model.predict(X_test_l0))
-        print("\tAccuracy: {:.2f}%".format(accuracy*100))
+        X_train_l0, X_test_l0, y_train_l0, y_test_l0 = train_test_split(X, y, test_size = 0.4, random_state = 12)
+        # print("[*]L0 Training MLPClassifier NN with adam solver...")
+        # adam_model_params = {'batch_size': 300, 'epsilon': 0.01, 'hidden_layer_sizes': (1000,), 'max_iter': 5000, 'solver': 'adam', 'activation': 'tanh', 'n_iter_no_change': 50,}
+        # adam_model = MLPClassifier(**adam_model_params)
+        # adam_model.fit(X_train_l0, y_train_l0)
+        # print("[*]L0 Testing MLPClassifier NN with adam solver...")
+        # accuracy = accuracy_score(y_true = y_test_l0, y_pred = adam_model.predict(X_test_l0))
+        # print("\tAccuracy: {:.2f}%".format(accuracy*100))
+        # print("[*]L0 Training MLPClassifier NN with lbfgs solver...")
+        # lbgfs_model_params = {'batch_size': 300, 'hidden_layer_sizes': (1000,),  'max_iter': 5000, 'solver': 'lbfgs', 'activation': 'tanh'}
+        # lbgfs_model = MLPClassifier(**lbgfs_model_params)
+        # lbgfs_model.fit(X_train_l0, y_train_l0)
+        # print("[*]L0 Testing MLPClassifier NN with lbfgs solver...")
+        # accuracy = accuracy_score(y_true = y_test_l0, y_pred = lbgfs_model.predict(X_test_l0))
+        # print("\tAccuracy: {:.2f}%".format(accuracy*100))
+        adam_model = pickle.load(open("adam.model", "rb"))###############
+        lbgfs_model = pickle.load(open("lbgfs.model", "rb"))#############
         X_train_l1, X_test_l1, y_train_l1, y_test_l1 = train_test_split(X_test_l0, y_test_l0, test_size = 0.2)
         stackX = self.get_stacked(X_train_l1, [adam_model, lbgfs_model])
         model = LogisticRegression()
@@ -183,10 +168,10 @@ class Voice_Recognizer:
         print("[*]L1 Testing LogisticRegression ML ensemble model...")
         accuracy = accuracy_score(y_true = y_test_l1, y_pred = model.predict(stackX))
         print("\tAccuracy: {:.2f}%".format(accuracy*100))
-        print("[*] Saving models to disk...")
-        pickle.dump(model, open("ensemble.model", "wb"))
-        pickle.dump(adam_model, open("adam.model", "wb"))
-        pickle.dump(lbgfs_model, open("lbgfs.model", "wb"))
+        # print("[*] Saving models to disk...")
+        # pickle.dump(model, open("ensemble.model", "wb"))
+        # pickle.dump(adam_model, open("adam.model", "wb"))
+        # pickle.dump(lbgfs_model, open("lbgfs.model", "wb"))
         
     def finalize_models(self):
         print("[*]L0 Loading saved RAVDESS features...")
@@ -269,9 +254,10 @@ class Voice_Recognizer:
 def main():
     voice_rec = Voice_Recognizer(os.path.join("data_files", "voice_training"))
     voice_rec.full_research()
-    # voice_rec.finalize_models()
+    """
     for file in glob.glob(os.path.join("demo", "*.wav")):
         print(os.path.basename(file) + " " + voice_rec.predict(file))
+    """
     
 if __name__ == "__main__":
-    main()  
+    main()

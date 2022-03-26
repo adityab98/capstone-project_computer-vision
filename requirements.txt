@@ -9,3 +9,5 @@ sounddevice
 scipy
 keras
 tensorflow
+seaborn
+pandas

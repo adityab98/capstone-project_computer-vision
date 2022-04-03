@@ -17,22 +17,22 @@ warnings.filterwarnings("ignore")
 class Voice_Recognizer:
     def __init__(self, training_data):
         self.int2emotion = {
-            "01": "neutral", 
-            "02": "calm", 
+            "01": "tender", 
+            "02": "tender", 
             "03": "happy", 
             "04": "sad", 
             "05": "angry", 
-            "06": "fearful", 
-            "07": "disgust", 
-            "08": "surprised"
+            "06": "scared", 
+            "07": "angry", 
+            "08": "excited"
         }
         self.tess2emotion = {
             "angry": "angry",
-            "fear": "fearful",
+            "fear": "scared",
             "happy": "happy",
-            "disgust": "disgust",
-            "neutral": "neutral",
-            "ps": "surprised",
+            "disgust": "angry",
+            "neutral": "tender",
+            "ps": "excited",
             "sad": "sad"
         }
         self.training_data = training_data
@@ -143,22 +143,22 @@ class Voice_Recognizer:
         print("[*]L0 Preprocessing data...")
         X = self.normalize(X)
         X_train_l0, X_test_l0, y_train_l0, y_test_l0 = train_test_split(X, y, test_size = 0.4, random_state = 12)
+        adam_model = pickle.load(open("adam.model", "rb"))
+        lbgfs_model = pickle.load(open("lbgfs.model", "rb"))
         # print("[*]L0 Training MLPClassifier NN with adam solver...")
         # adam_model_params = {'batch_size': 300, 'epsilon': 0.01, 'hidden_layer_sizes': (1000,), 'max_iter': 5000, 'solver': 'adam', 'activation': 'tanh', 'n_iter_no_change': 50,}
         # adam_model = MLPClassifier(**adam_model_params)
         # adam_model.fit(X_train_l0, y_train_l0)
-        # print("[*]L0 Testing MLPClassifier NN with adam solver...")
-        # accuracy = accuracy_score(y_true = y_test_l0, y_pred = adam_model.predict(X_test_l0))
-        # print("\tAccuracy: {:.2f}%".format(accuracy*100))
+        print("[*]L0 Testing MLPClassifier NN with adam solver...")
+        accuracy = accuracy_score(y_true = y_test_l0, y_pred = adam_model.predict(X_test_l0))
+        print("\tAccuracy: {:.2f}%".format(accuracy*100))
         # print("[*]L0 Training MLPClassifier NN with lbfgs solver...")
         # lbgfs_model_params = {'batch_size': 300, 'hidden_layer_sizes': (1000,),  'max_iter': 5000, 'solver': 'lbfgs', 'activation': 'tanh'}
         # lbgfs_model = MLPClassifier(**lbgfs_model_params)
         # lbgfs_model.fit(X_train_l0, y_train_l0)
-        # print("[*]L0 Testing MLPClassifier NN with lbfgs solver...")
-        # accuracy = accuracy_score(y_true = y_test_l0, y_pred = lbgfs_model.predict(X_test_l0))
-        # print("\tAccuracy: {:.2f}%".format(accuracy*100))
-        adam_model = pickle.load(open("adam.model", "rb"))###############
-        lbgfs_model = pickle.load(open("lbgfs.model", "rb"))#############
+        print("[*]L0 Testing MLPClassifier NN with lbfgs solver...")
+        accuracy = accuracy_score(y_true = y_test_l0, y_pred = lbgfs_model.predict(X_test_l0))
+        print("\tAccuracy: {:.2f}%".format(accuracy*100))
         X_train_l1, X_test_l1, y_train_l1, y_test_l1 = train_test_split(X_test_l0, y_test_l0, test_size = 0.2)
         stackX = self.get_stacked(X_train_l1, [adam_model, lbgfs_model])
         model = LogisticRegression()

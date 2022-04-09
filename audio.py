@@ -168,20 +168,18 @@ class Voice_Recognizer:
         print("[*]L1 Testing LogisticRegression ML ensemble model...")
         accuracy = accuracy_score(y_true = y_test_l1, y_pred = model.predict(stackX))
         print("\tAccuracy: {:.2f}%".format(accuracy*100))
-        # print("[*] Saving models to disk...")
-        # pickle.dump(model, open("ensemble.model", "wb"))
-        # pickle.dump(adam_model, open("adam.model", "wb"))
-        # pickle.dump(lbgfs_model, open("lbgfs.model", "wb"))
+        print("[*] Saving models to disk...")
+        pickle.dump(model, open("ensemble.model", "wb"))
+        pickle.dump(adam_model, open("adam.model", "wb"))
+        pickle.dump(lbgfs_model, open("lbgfs.model", "wb"))
         
-    def finalize_models(self):
-        print("[*]L0 Loading saved RAVDESS features...")
+    def research_adam(self):
         mfccs_arr = pickle.load(open("ravdess_mfcc.list", "rb"))
         chromas_arr = pickle.load(open("ravdess_chroma.list", "rb"))
         mels_arr = pickle.load(open("ravdess_mel.list", "rb"))
         contrasts_arr = pickle.load(open("ravdess_contrast.list", "rb"))
         tonnetzs_arr = pickle.load(open("ravdess_tonnetz.list", "rb"))
         y = pickle.load(open("ravdess_y.list", "rb"))
-        print("[*]L0 Loading saved TESS features...")
         mfccs_arr.extend(pickle.load(open("tess_mfcc.list", "rb")))
         chromas_arr.extend(pickle.load(open("tess_chroma.list", "rb")))
         mels_arr.extend(pickle.load(open("tess_mel.list", "rb")))
@@ -191,73 +189,48 @@ class Voice_Recognizer:
         X = []
         for i in range(len(mfccs_arr)):
             tmp = np.array([])
+            # comment each of these for different feature combinations
             tmp = np.hstack((tmp, mfccs_arr[i]))
-            tmp = np.hstack((tmp, chromas_arr[i]))
-            tmp = np.hstack((tmp, mels_arr[i]))
+            # tmp = np.hstack((tmp, chromas_arr[i]))
+            # tmp = np.hstack((tmp, mels_arr[i]))
             tmp = np.hstack((tmp, contrasts_arr[i]))
-            tmp = np.hstack((tmp, tonnetzs_arr[i]))
+            # tmp = np.hstack((tmp, tonnetzs_arr[i]))
+            ##########################################################
             X.append(tmp)
             del tmp
-        print("[*]L0 Preprocessing data...")
-        X = self.normalize(X)
-        X_train_l0, X_train_l1, y_train_l0, y_train_l1 = train_test_split(X, y, test_size = 0.4)
-        print("[*]L0 Training MLPClassifier NN with adam solver...")
-        adam_model_params = {
-            'alpha': 0.0001,
-            'batch_size': 300,
-            'epsilon': 0.01,
-            'hidden_layer_sizes': (1000,),
-            'max_iter': 5000,
-            'solver': 'adam',
-            'activation': 'tanh',
-            'shuffle': True,
-            'n_iter_no_change': 50,
-        }
+        print("Without normalization or NN optimization:")
+        X_train, X_test, y_train, y_test = train_test_split(np.array(X), y, test_size = 0.2, random_state = 12)
+        adam_model_params = {'hidden_layer_sizes': (1000,), 'max_iter': 5000, 'solver': 'adam'}
         adam_model = MLPClassifier(**adam_model_params)
-        adam_model.fit(X_train_l0, y_train_l0)
-        print("[*]L0 Training MLPClassifier NN with lbfgs solver...")
-        lbgfs_model_params = {
-            'alpha': 0.0001,
-            'batch_size': 300,
-            'hidden_layer_sizes': (1000,), 
-            'max_iter': 5000,
-            'solver': 'lbfgs',
-            'activation': 'tanh',
-        }
-        lbgfs_model = MLPClassifier(**lbgfs_model_params)
-        lbgfs_model.fit(X_train_l0, y_train_l0)
-        stackX = self.get_stacked(X_train_l1, [adam_model, lbgfs_model])
-        model = LogisticRegression()
-        print("[*]L1 Training LogisticRegression ML ensemble model...")
-        model.fit(stackX, y_train_l1)
-        print("[*] Saving models to disk...")
-        pickle.dump(model, open("ensemble.model", "wb"))
-        pickle.dump(adam_model, open("adam.model", "wb"))
-        pickle.dump(lbgfs_model, open("lbgfs.model", "wb"))        
-        
-    def predict(self, audio_src_file):
-        mfcc, chroma, mel, contrast, tonnetz = self.extract_feature(audio_src_file)
-        X = np.array([])
-        X = np.hstack((X, mfcc))
-        X = np.hstack((X, chroma))
-        X = np.hstack((X, mel))
-        X = np.hstack((X, contrast))
-        X = np.hstack((X, tonnetz))
-        X = [X]
-        X = self.normalize(X)
-        adam_model = pickle.load(open("adam.model", "rb"))
-        lbgfs_model = pickle.load(open("lbgfs.model", "rb"))
-        ensemble_model = pickle.load(open("ensemble.model", "rb"))
-        stackX = self.get_stacked(X, [adam_model, lbgfs_model])
-        return ensemble_model.predict(stackX)[0]
+        adam_model.fit(X_train, y_train)
+        accuracy = accuracy_score(y_true = y_test, y_pred = adam_model.predict(X_test))
+        print("\tAccuracy: {:.2f}%".format(accuracy*100))
+        print("With normalization but without NN optimization:")
+        X_train, X_test, y_train, y_test = train_test_split(self.normalize(X), y, test_size = 0.2, random_state = 12)
+        adam_model_params = {'hidden_layer_sizes': (1000,), 'max_iter': 5000, 'solver': 'adam'}
+        adam_model = MLPClassifier(**adam_model_params)
+        adam_model.fit(X_train, y_train)
+        accuracy = accuracy_score(y_true = y_test, y_pred = adam_model.predict(X_test))
+        print("\tAccuracy: {:.2f}%".format(accuracy*100))
+        print("Without normalization but with NN optimization:")
+        X_train, X_test, y_train, y_test = train_test_split(np.array(X), y, test_size = 0.2, random_state = 12)
+        adam_model_params = {'batch_size': 300, 'epsilon': 0.01, 'hidden_layer_sizes': (1000,), 'max_iter': 5000, 'solver': 'adam', 'activation': 'tanh', 'n_iter_no_change': 50,}
+        adam_model = MLPClassifier(**adam_model_params)
+        adam_model.fit(X_train, y_train)
+        accuracy = accuracy_score(y_true = y_test, y_pred = adam_model.predict(X_test))
+        print("\tAccuracy: {:.2f}%".format(accuracy*100))
+        print("With normalization and NN optimization:")
+        X_train, X_test, y_train, y_test = train_test_split(self.normalize(X), y, test_size = 0.2, random_state = 12)
+        adam_model_params = {'batch_size': 300, 'epsilon': 0.01, 'hidden_layer_sizes': (1000,), 'max_iter': 5000, 'solver': 'adam', 'activation': 'tanh', 'n_iter_no_change': 50,}
+        adam_model = MLPClassifier(**adam_model_params)
+        adam_model.fit(X_train, y_train)
+        accuracy = accuracy_score(y_true = y_test, y_pred = adam_model.predict(X_test))
+        print("\tAccuracy: {:.2f}%".format(accuracy*100))
 
 def main():
     voice_rec = Voice_Recognizer(os.path.join("data_files", "voice_training"))
-    voice_rec.full_research()
-    """
-    for file in glob.glob(os.path.join("demo", "*.wav")):
-        print(os.path.basename(file) + " " + voice_rec.predict(file))
-    """
+    voice_rec.research_adam()
+    print("***********************************I AM DONE**********************************************")
     
 if __name__ == "__main__":
     main()
